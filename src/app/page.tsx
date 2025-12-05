@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getAllPosts } from '@/utils/posts'
 import PostCard from '@/components/PostCard'
 
@@ -10,10 +11,13 @@ export default function Home() {
       {/* Hero Section */}
       <section className="text-center py-16 bg-gradient-to-b from-blue-50 to-white rounded-lg mb-12">
         <div className="mb-6 flex justify-center">
-          <img 
+          <Image 
             src="/images/logo.png" 
             alt="Freelance Dev Lab Logo" 
+            width={128}
+            height={128}
             className="h-32 w-auto"
+            unoptimized
           />
         </div>
         <h1 className="text-5xl font-bold mb-4 text-gray-900">

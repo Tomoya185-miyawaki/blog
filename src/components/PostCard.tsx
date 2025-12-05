@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
+import { useState } from 'react'
 
 interface Post {
   slug: string
@@ -19,18 +21,22 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const [imgSrc, setImgSrc] = useState(post.thumbnail || '/images/default-thumbnail.svg')
+
   return (
     <Link href={`/posts/${post.slug}`} className="block">
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
         {post.thumbnail && (
-          <div className="aspect-video bg-gray-100 overflow-hidden">
-            <img
-              src={post.thumbnail}
+          <div className="aspect-video bg-gray-100 overflow-hidden relative">
+            <Image
+              src={imgSrc}
               alt={post.title}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/images/default-thumbnail.svg'
+              fill
+              className="object-cover"
+              onError={() => {
+                setImgSrc('/images/default-thumbnail.svg')
               }}
+              unoptimized
             />
           </div>
         )}
