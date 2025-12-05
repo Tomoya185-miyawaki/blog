@@ -52,3 +52,28 @@ body {
 .prose li {
   @apply mb-2;
 }
+
+/* テーブルスタイル */
+.prose table {
+  @apply w-full border-collapse mb-6 mt-6;
+}
+
+.prose thead {
+  @apply bg-gray-100;
+}
+
+.prose th {
+  @apply border border-gray-300 px-4 py-3 text-left font-bold text-gray-900;
+}
+
+.prose td {
+  @apply border border-gray-300 px-4 py-3 text-gray-700;
+}
+
+.prose tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-blue-500 pl-4 italic text-gray-700 my-4;
+}
