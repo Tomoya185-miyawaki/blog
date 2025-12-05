@@ -57,15 +57,13 @@ export default async function PostPage({ params }: { params: { slug: string } })
       {ADSENSE_SLOT_DISPLAY && <DisplayAd adSlot={ADSENSE_SLOT_DISPLAY} />}
 
       {/* Thumbnail */}
-      {post.thumbnail && (
-        <div className="mb-8 rounded-lg overflow-hidden bg-gray-100">
-          <PostImage
-            src={post.thumbnail}
-            alt={post.title}
-            className="w-full h-auto"
-          />
-        </div>
-      )}
+      <div className="mb-8 rounded-lg overflow-hidden bg-gray-100">
+        <PostImage
+          src={post.thumbnail || '/images/default-thumbnail.svg'}
+          alt={post.title}
+          className="w-full h-auto"
+        />
+      </div>
 
       {/* Content with in-article ads */}
       <div className="prose prose-lg max-w-none">

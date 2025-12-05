@@ -19,7 +19,7 @@ export default function PostImage({
   width = 800,
   height = 400
 }: PostImageProps) {
-  const [imgSrc, setImgSrc] = useState(src)
+  const [imgSrc, setImgSrc] = useState(getImagePath(src))
 
   return (
     <Image

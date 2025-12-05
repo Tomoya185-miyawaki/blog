@@ -22,25 +22,26 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const [imgSrc, setImgSrc] = useState(post.thumbnail || getImagePath('/images/default-thumbnail.svg'))
+  const defaultThumbnail = getImagePath('/images/default-thumbnail.svg')
+  const [imgSrc, setImgSrc] = useState(
+    post.thumbnail ? getImagePath(post.thumbnail) : defaultThumbnail
+  )
 
   return (
     <Link href={`/posts/${post.slug}`} className="block">
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
-        {post.thumbnail && (
-          <div className="aspect-video bg-gray-100 overflow-hidden relative">
-            <Image
-              src={imgSrc}
-              alt={post.title}
-              fill
-              className="object-cover"
-              onError={() => {
-                setImgSrc(getImagePath('/images/default-thumbnail.svg'))
-              }}
-              unoptimized
-            />
-          </div>
-        )}
+        <div className="aspect-video bg-gray-100 overflow-hidden relative">
+          <Image
+            src={imgSrc}
+            alt={post.title}
+            fill
+            className="object-cover"
+            onError={() => {
+              setImgSrc(defaultThumbnail)
+            }}
+            unoptimized
+          />
+        </div>
         
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">

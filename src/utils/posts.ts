@@ -42,13 +42,16 @@ export function getAllPosts(): Post[] {
       const fileContents = fs.readFileSync(fullPath, 'utf8')
       const { data, content } = matter(fileContents)
 
+      // サムネイルパスはそのまま保持（各コンポーネントでgetImagePath()を使用）
+      const thumbnail = data.thumbnail || ''
+
       return {
         slug,
         title: data.title || '',
         date: data.date || '',
         category: data.category || '',
         tags: data.tags || [],
-        thumbnail: data.thumbnail || '',
+        thumbnail,
         excerpt: data.excerpt || content.slice(0, 150).replace(/[#*\[\]]/g, '') + '...',
         content,
         affiliate_link: data.affiliate_link || '',
