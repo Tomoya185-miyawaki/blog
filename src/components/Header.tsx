@@ -6,11 +6,6 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4 max-w-6xl">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img 
-              src="/images/logo.png" 
-              alt="Freelance Dev Lab" 
-              className="h-10 w-auto"
-            />
             <span className="text-2xl font-bold text-gray-900">
               Freelance Dev Lab
             </span>

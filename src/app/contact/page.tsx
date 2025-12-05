@@ -26,21 +26,6 @@ export default function ContactPage() {
                 tomo16185@gmail.com
               </a>
             </div>
-
-            <div>
-              <h3 className="text-xl font-bold mb-2">💬 TwitterでのDM</h3>
-              <p className="text-gray-700">
-                お急ぎの場合は、TwitterのDMでもお問い合わせを受け付けております。
-              </p>
-              <a 
-                href="https://twitter.com/your_twitter_handle" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-2 text-blue-600 hover:underline text-lg font-medium"
-              >
-                @your_twitter_handle
-              </a>
-            </div>
           </div>
         </section>
 
