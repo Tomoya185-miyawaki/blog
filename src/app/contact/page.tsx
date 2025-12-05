@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function ContactPage() {
   return (
     <div className="max-w-4xl mx-auto">
@@ -92,9 +94,9 @@ export default function ContactPage() {
             お問い合わせの際にご提供いただいた個人情報は、
             お問い合わせへの回答および必要な連絡のみに使用いたします。<br />
             詳しくは
-            <a href="/privacy" className="text-blue-600 hover:underline ml-1">
+            <Link href="/privacy" className="text-blue-600 hover:underline ml-1">
               プライバシーポリシー
-            </a>
+            </Link>
             をご覧ください。
           </p>
         </section>
