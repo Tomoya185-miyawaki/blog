@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getAllPosts } from '@/utils/posts'
 import PostCard from '@/components/PostCard'
+import { getImagePath } from '@/utils/image'
 
 export default function Home() {
   const posts = getAllPosts().slice(0, 6)
@@ -12,7 +13,7 @@ export default function Home() {
       <section className="text-center py-16 bg-gradient-to-b from-blue-50 to-white rounded-lg mb-12">
         <div className="mb-6 flex justify-center">
           <Image 
-            src="/images/logo.png" 
+            src={getImagePath('/images/logo.png')}
             alt="Freelance Dev Lab Logo" 
             width={128}
             height={128}

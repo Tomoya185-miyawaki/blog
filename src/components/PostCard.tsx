@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { useState } from 'react'
+import { getImagePath } from '@/utils/image'
 
 interface Post {
   slug: string
@@ -21,7 +22,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const [imgSrc, setImgSrc] = useState(post.thumbnail || '/images/default-thumbnail.svg')
+  const [imgSrc, setImgSrc] = useState(post.thumbnail || getImagePath('/images/default-thumbnail.svg'))
 
   return (
     <Link href={`/posts/${post.slug}`} className="block">
@@ -34,7 +35,7 @@ export default function PostCard({ post }: PostCardProps) {
               fill
               className="object-cover"
               onError={() => {
-                setImgSrc('/images/default-thumbnail.svg')
+                setImgSrc(getImagePath('/images/default-thumbnail.svg'))
               }}
               unoptimized
             />

@@ -1,11 +1,12 @@
 import Image from 'next/image'
+import { getImagePath } from '@/utils/image'
 
 export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
         <Image 
-          src="/images/logo.png" 
+          src={getImagePath('/images/logo.png')}
           alt="Freelance Dev Lab Logo" 
           width={96}
           height={96}

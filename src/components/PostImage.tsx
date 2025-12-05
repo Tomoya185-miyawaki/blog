@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { getImagePath } from '@/utils/image'
 
 interface PostImageProps {
   src: string
@@ -28,7 +29,7 @@ export default function PostImage({
       height={height}
       className={className}
       onError={() => {
-        setImgSrc('/images/default-thumbnail.svg')
+        setImgSrc(getImagePath('/images/default-thumbnail.svg'))
       }}
       unoptimized
     />
