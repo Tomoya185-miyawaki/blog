@@ -127,10 +127,10 @@ export default function PrivacyPage() {
             運営者: Freelance Dev Lab<br />
             お問い合わせ: 
             <a 
-              href="mailto:contact@example.com" 
+              href="mailto:tomo16185@gmail.com" 
               className="text-blue-600 hover:underline ml-2"
             >
-              contact@example.com
+              tomo16185@gmail.com
             </a>
           </p>
         </section>

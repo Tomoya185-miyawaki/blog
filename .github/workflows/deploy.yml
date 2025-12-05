@@ -28,6 +28,19 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Debug - Check files
+        run: |
+          echo "=== Checking configuration files ==="
+          ls -la
+          echo "=== jsconfig.json ==="
+          cat jsconfig.json || echo "jsconfig.json not found"
+          echo "=== next.config.js ==="
+          cat next.config.js || echo "next.config.js not found"
+          echo "=== tsconfig.json ==="
+          cat tsconfig.json || echo "tsconfig.json not found"
+          echo "=== src/lib/posts.ts ==="
+          ls -la src/lib/ || echo "src/lib not found"
+
       - name: Install dependencies
         run: npm ci
 
