@@ -1,4 +1,4 @@
-import { getAllPosts } from '@/lib/posts'
+import { getAllPosts } from '@/utils/posts'
 import PostCard from '@/components/PostCard'
 import Link from 'next/link'
 

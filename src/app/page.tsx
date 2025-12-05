@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getAllPosts } from '@/lib/posts'
+import { getAllPosts } from '@/utils/posts'
 import PostCard from '@/components/PostCard'
 
 export default function Home() {
