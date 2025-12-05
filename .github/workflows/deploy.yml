@@ -33,16 +33,25 @@ jobs:
           echo "=== Checking configuration files ==="
           ls -la
           echo "=== jsconfig.json ==="
-          cat jsconfig.json || echo "jsconfig.json not found"
+          cat jsconfig.json 2>/dev/null || echo "jsconfig.json not found"
           echo "=== next.config.js ==="
           cat next.config.js || echo "next.config.js not found"
           echo "=== tsconfig.json ==="
           cat tsconfig.json || echo "tsconfig.json not found"
           echo "=== src/lib/posts.ts ==="
           ls -la src/lib/ || echo "src/lib not found"
+          echo "=== Check TypeScript compilation ==="
+          npx tsc --noEmit --listFiles | grep "src/lib/posts" || echo "posts.ts not found in compilation"
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Debug - Check after install
+        run: |
+          echo "=== node_modules check ==="
+          ls -la node_modules/.bin/ | grep next
+          echo "=== Next.js version ==="
+          npx next --version
 
       - name: Build with Next.js
         run: npm run build
