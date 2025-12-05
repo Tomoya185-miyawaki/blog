@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import PostImage from '@/components/PostImage'
+import { DisplayAd, InArticleAd } from '@/components/GoogleAdsense'
 
 export async function generateStaticParams() {
   const posts = getAllPosts()
@@ -17,6 +18,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
   if (!post) {
     notFound()
   }
+
+  const ADSENSE_SLOT_DISPLAY = process.env.NEXT_PUBLIC_ADSENSE_SLOT_DISPLAY || ''
+  const ADSENSE_SLOT_IN_ARTICLE = process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE || ''
 
   return (
     <article className="max-w-4xl mx-auto">
@@ -49,6 +53,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
         )}
       </header>
 
+      {/* 記事上部広告 */}
+      {ADSENSE_SLOT_DISPLAY && <DisplayAd adSlot={ADSENSE_SLOT_DISPLAY} />}
+
       {/* Thumbnail */}
       {post.thumbnail && (
         <div className="mb-8 rounded-lg overflow-hidden bg-gray-100">
@@ -60,11 +67,24 @@ export default async function PostPage({ params }: { params: { slug: string } })
         </div>
       )}
 
-      {/* Content */}
-      <div 
-        className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
+      {/* Content with in-article ads */}
+      <div className="prose prose-lg max-w-none">
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        
+        {/* 記事内広告（記事の途中に表示） */}
+        {ADSENSE_SLOT_IN_ARTICLE && (
+          <div className="my-8">
+            <InArticleAd adSlot={ADSENSE_SLOT_IN_ARTICLE} />
+          </div>
+        )}
+      </div>
+
+      {/* 記事下部広告 */}
+      {ADSENSE_SLOT_DISPLAY && (
+        <div className="mt-8">
+          <DisplayAd adSlot={ADSENSE_SLOT_DISPLAY} />
+        </div>
+      )}
     </article>
   )
 }
