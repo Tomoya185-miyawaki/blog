@@ -194,7 +194,7 @@ def main():
     rag = LocalLLMRAG(model_name=model_name, documents_dir="./documents")
     
     # セットアップ
-    if not rag.setup():
+    if not rag.setup(True):
         print("\nセットアップに失敗しました")
         return
     

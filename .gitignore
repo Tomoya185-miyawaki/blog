@@ -57,6 +57,7 @@ ENV/
 /local_llm/.venv/
 /local_llm/.mypy_cache/
 /local_llm/.pytest_cache/
+/local_llm/documents/*
 
 # chroma db
 /chroma_db/*

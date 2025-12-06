@@ -1,5 +1,5 @@
 """
-ローカルLLM + RAGを使った記事自動生成スクリプト
+ローカルLLM + RAGを使った記事自動生成スクリプト（プロンプト指定対応版）
 SEOガイドなどの資料を学習させた上で、質の高い記事を生成します
 """
 
@@ -7,6 +7,7 @@ import sys
 import os
 from datetime import datetime
 import random
+import argparse
 
 # 親ディレクトリのモジュールをインポート可能にする
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -59,18 +60,34 @@ class ArticleGenerator:
         
         print("✅ RAGシステムの初期化が完了しました\n")
     
-    def generate_title(self, category: str, keywords: list) -> str:
+    def generate_title(self, category: str, keywords: list, custom_prompt: str = None) -> str:
         """
         記事タイトルを生成
         
         Args:
             category: カテゴリ名
             keywords: キーワードリスト
+            custom_prompt: カスタムプロンプト（指定時はこれを優先）
             
         Returns:
             記事タイトル
         """
-        prompt = f"""あなたはSEOに詳しいコンテンツライターです。
+        if custom_prompt:
+            prompt = f"""あなたはSEOに詳しいコンテンツライターです。
+以下のリクエストに基づいて、魅力的なブログ記事のタイトルを1つだけ生成してください。
+
+リクエスト: {custom_prompt}
+
+条件:
+- 30-40文字程度
+- SEOを意識したキーワードを含める
+- 読者の興味を引くタイトル
+- 数字を入れると効果的
+
+タイトルのみを出力してください。説明は不要です。
+"""
+        else:
+            prompt = f"""あなたはSEOに詳しいコンテンツライターです。
 以下の条件で、魅力的なブログ記事のタイトルを1つだけ生成してください。
 
 カテゴリ: {category}
@@ -91,28 +108,74 @@ class ArticleGenerator:
         title = response.strip().strip('"').strip("'").strip()
         return title
     
-    def generate_article_content(self, title: str, category: str, keywords: list) -> str:
+    def generate_article_content(self, title: str, category: str, keywords: list, custom_prompt: str = None) -> str:
         """
-        記事本文を生成（RAGで学習した内容を反映）
+        記事本文を生成（RAGで参照資料を活用）
         
         Args:
             title: 記事タイトル
-            category: カテゴリ名
+            category: カテゴリ
             keywords: キーワードリスト
+            custom_prompt: カスタムプロンプト（指定時はこれを優先）
             
         Returns:
             記事本文（Markdown形式）
         """
-        # RAGで関連情報を取得
-        context_query = f"{category}に関するSEOベストプラクティスとコンテンツ作成のガイドライン"
+        # RAGで関連する情報を取得
+        if custom_prompt:
+            context_query = f"{custom_prompt} に関するSEOベストプラクティスとコンテンツ作成のガイドライン"
+        else:
+            context_query = f"{category}に関するSEOベストプラクティスとコンテンツ作成のガイドライン"
+        
         retriever = self.rag.create_qa_chain()
         relevant_docs = retriever.invoke(context_query)
         
         # コンテキストを構築
         context = "\n".join([doc.page_content for doc in relevant_docs[:2]])
         
-        prompt = f"""あなたは経験豊富なテックブロガーです。
-以下の条件で、実践的で価値のあるブログ記事を執筆してください。
+        # 記事生成プロンプト
+        if custom_prompt:
+            # カスタムプロンプトが指定されている場合
+            prompt = f"""あなたは経験豊富なテックブロガーです。
+以下の情報を参考に、エンジニア向けの実用的で価値の高い記事を執筆してください。
+
+【参考資料（SEOガイドライン）】
+{context}
+
+【記事リクエスト】
+{custom_prompt}
+
+【記事情報】
+タイトル: {title}
+カテゴリ: {category}
+
+【執筆条件】
+- 文字数: 2000-3000文字
+- トーン: 専門的だが親しみやすい
+- 構成: 導入 → 本文（複数セクション） → まとめ
+- Markdown形式で記述
+- 実践的なアドバイスを含める
+- リクエストされた内容に焦点を当てる
+
+【記事構成】
+## はじめに
+- 問題提起や課題の明確化
+- 記事で解決できることを提示
+
+## 本文
+- 実例やコード例を含める
+- 箇条書きや番号リストを活用
+
+## まとめ
+- 主要ポイントを振り返る
+- 次のアクションを提案
+
+Markdown形式で記事本文のみを出力してください。タイトル（#）は含めないでください。
+"""
+        else:
+            # デフォルトのプロンプト
+            prompt = f"""あなたは経験豊富なテックブロガーです。
+以下の情報を参考に、エンジニア向けの実用的で価値の高い記事を執筆してください。
 
 【参考資料（SEOガイドライン）】
 {context}
@@ -122,21 +185,19 @@ class ArticleGenerator:
 カテゴリ: {category}
 キーワード: {', '.join(keywords)}
 
-【記事の要件】
-1. 読者にとって実践的で役立つ内容
-2. 具体例やコード例を含める
-3. SEOを意識した自然な文章
-4. 見出し構造を適切に使用（##, ###）
-5. 2000-3000文字程度
-6. 専門的だが分かりやすい表現
+【執筆条件】
+- 文字数: 2000-3000文字
+- トーン: 専門的だが親しみやすい
+- 構成: 導入 → 本文（複数セクション） → まとめ
+- Markdown形式で記述
+- 実践的なアドバイスを含める
 
 【記事構成】
 ## はじめに
-- 読者の課題を明確にする
-- 記事で得られる価値を示す
+- 問題提起や課題の明確化
+- 記事で解決できることを提示
 
-## [メインコンテンツ（2-4セクション）]
-- 具体的な方法やテクニックを解説
+## 本文
 - 実例やコード例を含める
 - 箇条書きや番号リストを活用
 
@@ -168,38 +229,47 @@ Markdown形式で記事本文のみを出力してください。タイトル（
         # シンプルにカテゴリキーワードから3-4個選択
         return random.sample(category_keywords, min(4, len(category_keywords)))
     
-    def generate_article(self, category: str = None):
+    def generate_article(self, category: str = None, custom_prompt: str = None):
         """
         記事を自動生成してMarkdownファイルとして保存
         
         Args:
             category: カテゴリ名（Noneの場合はランダム選択）
+            custom_prompt: カスタムプロンプト（指定時は自由テーマで生成）
             
         Returns:
             生成されたファイルパス
         """
-        # カテゴリ選択
-        if category is None:
-            category = random.choice(CATEGORIES)
-        
-        print(f"🎯 カテゴリ: {category}")
-        
-        # キーワード取得
-        keywords = CATEGORY_KEYWORDS.get(category, ["技術", "開発", "効率化"])
-        selected_keywords = random.sample(keywords, min(3, len(keywords)))
-        
-        print(f"🔑 キーワード: {', '.join(selected_keywords)}")
+        if custom_prompt:
+            print(f"📝 カスタムリクエスト: {custom_prompt}\n")
+            # カスタムプロンプトの場合はカテゴリを自動推定
+            if category is None:
+                category = "AI × 開発効率化"  # デフォルトカテゴリ
+            keywords = ["カスタム", "技術", "開発"]
+        else:
+            # カテゴリ選択
+            if category is None:
+                category = random.choice(CATEGORIES)
+            
+            print(f"🎯 カテゴリ: {category}")
+            
+            # キーワード取得
+            keywords = CATEGORY_KEYWORDS.get(category, ["技術", "開発", "効率化"])
+            selected_keywords = random.sample(keywords, min(3, len(keywords)))
+            keywords = selected_keywords
+            
+            print(f"🔑 キーワード: {', '.join(keywords)}")
         
         # タイトル生成
         print("\n📌 タイトルを生成中...")
-        title = self.generate_title(category, selected_keywords)
+        title = self.generate_title(category, keywords, custom_prompt)
         print(f"✅ タイトル: {title}\n")
         
         # 記事本文生成
-        content = self.generate_article_content(title, category, selected_keywords)
+        content = self.generate_article_content(title, category, keywords, custom_prompt)
         
         # タグ生成
-        tags = self.generate_tags(title, content, keywords)
+        tags = self.generate_tags(title, content, keywords if custom_prompt else CATEGORY_KEYWORDS.get(category, keywords))
         
         # アフィリエイトリンク取得
         affiliate_link = get_affiliate_link(category)
@@ -244,6 +314,41 @@ affiliate_link: "{affiliate_link}"
 
 def main():
     """メイン実行"""
+    # コマンドライン引数のパース
+    parser = argparse.ArgumentParser(
+        description="ローカルLLM + RAGを使った記事自動生成",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+使用例:
+  # ランダムなカテゴリで記事生成
+  python scripts/generate_article_with_llm_v2.py
+  
+  # 特定のカテゴリで記事生成
+  python scripts/generate_article_with_llm_v2.py --category "Web開発"
+  
+  # カスタムプロンプトで記事生成
+  python scripts/generate_article_with_llm_v2.py --prompt "Next.js 15の新機能について解説する記事"
+  
+  # Makefileから実行
+  make llm PROMPT="Docker Composeの実践的な使い方"
+        """
+    )
+    
+    parser.add_argument(
+        '--category',
+        type=str,
+        help='記事のカテゴリ（指定しない場合はランダム）',
+        choices=CATEGORIES
+    )
+    
+    parser.add_argument(
+        '--prompt',
+        type=str,
+        help='カスタムプロンプト（例: "TypeScriptの型システムについて詳しく解説"）'
+    )
+    
+    args = parser.parse_args()
+    
     print("="*60)
     print("🤖 ローカルLLM記事自動生成システム")
     print("="*60)
@@ -254,7 +359,10 @@ def main():
         generator = ArticleGenerator()
         
         # 記事生成
-        generator.generate_article()
+        generator.generate_article(
+            category=args.category,
+            custom_prompt=args.prompt
+        )
         
         print("\n" + "="*60)
         print("✨ 記事生成が完了しました！")
