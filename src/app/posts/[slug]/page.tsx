@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import PostImage from '@/components/PostImage'
+import TableOfContents from '@/components/TableOfContents'
 import { DisplayAd, InArticleAd } from '@/components/GoogleAdsense'
 
 export async function generateStaticParams() {
@@ -64,6 +65,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
           className="w-full h-auto"
         />
       </div>
+
+      {/* 目次 */}
+      <TableOfContents content={post.content} />
 
       {/* Content with in-article ads */}
       <div className="prose prose-lg max-w-none">

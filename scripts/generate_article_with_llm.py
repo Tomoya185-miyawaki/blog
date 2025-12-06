@@ -168,41 +168,78 @@ Markdown形式で記事本文のみを出力してください。タイトル（
         # シンプルにカテゴリキーワードから3-4個選択
         return random.sample(category_keywords, min(4, len(category_keywords)))
     
-    def generate_article(self, category: str = None):
+    def generate_article(self, category: str = None, interactive: bool = True):
         """
         記事を自動生成してMarkdownファイルとして保存
         
         Args:
             category: カテゴリ名（Noneの場合はランダム選択）
+            interactive: タイトル確認を行うか（デフォルト: True）
             
         Returns:
             生成されたファイルパス
         """
-        # カテゴリ選択
-        if category is None:
-            category = random.choice(CATEGORIES)
+        # 使用済みカテゴリを追跡（NGで別のカテゴリを提案するため）
+        used_categories = []
         
-        print(f"🎯 カテゴリ: {category}")
+        # タイトル生成とユーザー確認ループ
+        title = None
+        final_category = category
+        final_keywords = None
         
-        # キーワード取得
-        keywords = CATEGORY_KEYWORDS.get(category, ["技術", "開発", "効率化"])
-        selected_keywords = random.sample(keywords, min(3, len(keywords)))
-        
-        print(f"🔑 キーワード: {', '.join(selected_keywords)}")
-        
-        # タイトル生成
-        print("\n📌 タイトルを生成中...")
-        title = self.generate_title(category, selected_keywords)
-        print(f"✅ タイトル: {title}\n")
+        while title is None:
+            # カテゴリ選択（NGの場合は未使用のカテゴリから選択）
+            if final_category is None or final_category in used_categories:
+                available_categories = [c for c in CATEGORIES if c not in used_categories]
+                if not available_categories:
+                    # 全カテゴリを使い切ったらリセット
+                    used_categories = []
+                    available_categories = CATEGORIES
+                final_category = random.choice(available_categories)
+            
+            used_categories.append(final_category)
+            
+            print(f"\n🎯 カテゴリ: {final_category}")
+            
+            # キーワード取得
+            keywords = CATEGORY_KEYWORDS.get(final_category, ["技術", "開発", "効率化"])
+            selected_keywords = random.sample(keywords, min(3, len(keywords)))
+            final_keywords = selected_keywords
+            
+            print(f"🔑 キーワード: {', '.join(selected_keywords)}")
+            
+            print("\n📌 タイトルを生成中...")
+            candidate_title = self.generate_title(final_category, selected_keywords)
+            print(f"\n✨ 生成されたタイトル: {candidate_title}")
+            
+            if interactive:
+                print("\n" + "="*60)
+                user_input = input("このタイトルで記事を作成しますか？ (OK/NG): ").strip().upper()
+                print("="*60 + "\n")
+                
+                if user_input == "OK":
+                    title = candidate_title
+                    print(f"✅ タイトル確定: {title}\n")
+                elif user_input == "NG":
+                    print("🔄 別のカテゴリとテーマで新しいタイトルを生成します...\n")
+                    final_category = None  # 次のループで新しいカテゴリを選択
+                    continue
+                else:
+                    print("⚠️  'OK'または'NG'を入力してください\n")
+                    continue
+            else:
+                title = candidate_title
+                print(f"✅ タイトル: {title}\n")
         
         # 記事本文生成
-        content = self.generate_article_content(title, category, selected_keywords)
+        content = self.generate_article_content(title, final_category, final_keywords)
         
         # タグ生成
-        tags = self.generate_tags(title, content, keywords)
+        all_keywords = CATEGORY_KEYWORDS.get(final_category, final_keywords)
+        tags = self.generate_tags(title, content, all_keywords)
         
         # アフィリエイトリンク取得
-        affiliate_link = get_affiliate_link(category)
+        affiliate_link = get_affiliate_link(final_category)
         
         # アフィリエイトリンクを記事末尾に追加
         content += f"\n\n---\n\n"
@@ -217,7 +254,7 @@ Markdown形式で記事本文のみを出力してください。タイトル（
         markdown = f"""---
 title: "{title}"
 date: "{date}"
-category: "{category}"
+category: "{final_category}"
 tags: {tags}
 thumbnail: "/images/default-thumbnail.svg"
 affiliate_link: "{affiliate_link}"
@@ -235,7 +272,7 @@ affiliate_link: "{affiliate_link}"
         
         print(f"\n✅ 記事を生成しました: {filename}")
         print(f"   📄 タイトル: {title}")
-        print(f"   📁 カテゴリ: {category}")
+        print(f"   📁 カテゴリ: {final_category}")
         print(f"   🏷️  タグ: {', '.join(tags)}")
         print(f"   📊 文字数: {len(content)}文字")
         

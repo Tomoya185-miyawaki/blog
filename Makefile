@@ -4,7 +4,7 @@ GEN := scripts/generate_article.py
 GEN_LLM := scripts/generate_article_with_llm.py
 GEN_LLM_V2 := scripts/generate_article_with_llm_v2.py
 CONVERT := scripts/convert_to_md.py
-DOC_DIR := local_llm/documents
+DOC_DIR := local_llm/documents/core
 
 .PHONY: help generate-article generate-llm llm-p
 
