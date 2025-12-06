@@ -43,3 +43,20 @@ __pycache__/
 env/
 venv/
 ENV/
+
+# local llm
+/local_llm/models/
+/local_llm/__pycache__/
+/local_llm/*.pyc
+/local_llm/*.log
+/local_llm/.env
+/local_llm/embeddings/
+/local_llm/vectorstores/
+/local_llm/__pypackages__/
+/local_llm/.python-version
+/local_llm/.venv/
+/local_llm/.mypy_cache/
+/local_llm/.pytest_cache/
+
+# chroma db
+/chroma_db/*

@@ -8,6 +8,13 @@ import GoogleAdsense from '@/components/GoogleAdsense'
 export const metadata: Metadata = {
   title: 'Freelance Dev Lab - 技術で稼ぐ力を、AIで最速に。',
   description: 'AI × 技術 × フリーランスの研究所。エンジニアが自由に稼ぐための情報を発信。',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     title: 'Freelance Dev Lab',
     description: 'AI × 技術 × フリーランスの研究所',
